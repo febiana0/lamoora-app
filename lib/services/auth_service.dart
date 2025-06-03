@@ -5,8 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io'; // Untuk SocketException
 
 class AuthService {
+
+  
   // Ganti dengan URL base API Anda
-  final String baseUrl = 'http://127.0.0.1:8000/api';  // 10.0.2.2 untuk Android Emulator ke localhost
+  final String baseUrl = 'http://54.151.193.220/api';  // 10.0.2.2 untuk Android Emulator ke localhost
   // Jika menggunakan perangkat fisik, gunakan IP komputer Anda, misalnya:
   // final String baseUrl = 'http://192.168.1.5:8000/api';
 
@@ -222,4 +224,60 @@ class AuthService {
       };
     }
   }
+
+   Future<Map<String, dynamic>> getUserProfile() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token == null) {
+        return {
+          'success': false,
+          'message': 'Token tidak ditemukan, silakan login ulang',
+        };
+      }
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/auth/user'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'data': responseData['user'] ?? responseData, // GANTI 'data' JADI 'user'
+        };
+      } else {
+        return {
+          'success': false,
+          'message': responseData['message'] ?? 'Gagal mengambil data profil',
+        };
+      }
+    } catch (e) {
+      print('Get user profile error: $e');
+      return {
+        'success': false,
+        'message': 'Terjadi kesalahan: ${e.toString()}',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> updateProfile({
+    required String name,
+    required String email,
+  }) async {
+    // TODO: Implement the actual update logic, e.g., API call
+    // This is a placeholder implementation
+    await Future.delayed(const Duration(seconds: 1));
+    return {
+      'success': true,
+      'message': 'Profile updated successfully',
+    };
+  }
+
+  
 }

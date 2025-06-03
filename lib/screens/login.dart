@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
-    final url = Uri.parse('http://127.0.0.1:8000/api/auth/login');
+    final url = Uri.parse('http://54.151.193.220/api/auth/login');
 
     final response = await http.post(
       url,
